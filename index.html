@@ -1,103 +1,147 @@
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skor Gaple</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        .btn-animate {
-            transition: transform 0.2s ease-in-out;
-        }
-        .btn-animate:hover {
-            transform: scale(1.1);
-        }
-    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const updateValue = (element, increment) => {
+                const valueElement = element.querySelector('.value');
+                let currentValue = parseInt(valueElement.textContent);
+                currentValue += increment;
+
+                if (valueElement.classList.contains('text-green-500') && currentValue > 7) {
+                    showModal('win');
+                    return;
+                }
+
+                if (valueElement.classList.contains('text-blue-500')) {
+                    if (currentValue > 10) {
+                        currentValue = 0;
+                        incrementGreenValue(element);
+                    }
+                }
+
+                if (valueElement.classList.contains('text-red-700') && currentValue > 6) {
+                    currentValue = 0;
+                }
+
+                valueElement.textContent = currentValue;
+            };
+
+            const incrementGreenValue = (element) => {
+                const greenValueElement = element.parentElement.querySelector('.text-green-500');
+                let greenValue = parseInt(greenValueElement.textContent);
+                greenValue += 1;
+                greenValueElement.textContent = greenValue;
+            };
+
+            const showModal = (type) => {
+                const modal = document.getElementById(type === 'win' ? 'modal-win' : 'modal-edit');
+                modal.classList.remove('hidden');
+            };
+
+            const closeModal = (type) => {
+                const modal = document.getElementById(type === 'win' ? 'modal-win' : 'modal-edit');
+                modal.classList.add('hidden');
+            };
+
+            const resetValues = () => {
+                document.querySelectorAll('.value').forEach(valueElement => {
+                    valueElement.textContent = '0';
+                });
+            };
+
+            document.querySelectorAll('.counter').forEach(counter => {
+                counter.querySelector('.decrement').addEventListener('click', () => updateValue(counter, -1));
+                counter.querySelector('.increment').addEventListener('click', () => updateValue(counter, 1));
+            });
+
+            document.getElementById('close-modal-win').addEventListener('click', () => closeModal('win'));
+            document.getElementById('close-modal-edit').addEventListener('click', () => closeModal('edit'));
+
+            document.querySelectorAll('.editable').forEach(editable => {
+                editable.addEventListener('click', () => {
+                    const playerName = editable.textContent;
+                    document.getElementById('player-name-input').value = playerName;
+                    document.getElementById('current-edit').value = editable.id;
+                    showModal('edit');
+                });
+            });
+
+            document.getElementById('save-name').addEventListener('click', () => {
+                const newName = document.getElementById('player-name-input').value;
+                const currentEdit = document.getElementById('current-edit').value;
+                document.getElementById(currentEdit).textContent = newName;
+                closeModal('edit');
+            });
+
+            document.getElementById('reset-button').addEventListener('click', resetValues);
+        });
+    </script>
 </head>
-<body class="bg-black font-roboto">
-    <div class="container mx-auto p-4">
-        <h1 class="text-4xl font-bold text-center mb-8 text-white">Gaple scoreboard</h1>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <input type="text" id="timA" class="text-2xl font-bold mb-4 w-full text-center bg-gray-800 text-white border-b-2 border-gray-600 focus:outline-none focus:border-blue-500" value="Tim A" oninput="updateTeamName('A')">
-                <div class="flex items-center justify-between mb-4">
-                    <button class="bg-red-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-red-700 transition duration-300 btn-animate" onclick="ubahSkor('A', 'besar', -1)">-</button>
-                    <span class="text-lg text-gray-300">Skor Besar:</span>
-                    <span class="text-6xl font-bold text-white" id="skorBesarA">0</span>
-                    <button class="bg-blue-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 btn-animate" onclick="ubahSkor('A', 'besar', 1)">+</button>
+<body class="bg-gray-100 font-roboto flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center space-y-8">
+        <div class="flex space-x-16">
+            <!-- Player 1 -->
+            <div class="flex flex-col items-center">
+                <h2 id="player1" class="text-xl font-bold mb-4 editable cursor-pointer">Player 1</h2>
+                <div class="counter flex items-center space-x-4 mb-4">
+                    <button class="decrement text-2xl font-bold text-gray-700">-</button>
+                    <span class="value text-8xl font-extrabold text-green-500">0</span>
+                    <button class="increment text-2xl font-bold text-gray-700">+</button>
                 </div>
-                <div class="flex items-center justify-between">
-                    <button class="bg-red-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-red-700 transition duration-300 btn-animate" onclick="ubahSkor('A', 'kecil', -1)">-</button>
-                    <span class="text-lg text-gray-300">Skor Kecil:</span>
-                    <span class="text-4xl font-bold text-white" id="skorKecilA">0</span>
-                    <button class="bg-blue-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-blue-700 transition duration-300 btn-animate" onclick="ubahSkor('A', 'kecil', 1)">+</button>
+                <div class="counter flex items-center space-x-4">
+                    <button class="decrement text-2xl font-bold text-gray-700">-</button>
+                    <span class="value text-4xl font-extrabold text-blue-500">0</span>
+                    <button class="increment text-2xl font-bold text-gray-700">+</button>
                 </div>
             </div>
-            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
-                <input type="text" id="timB" class="text-2xl font-bold mb-4 w-full text-center bg-gray-800 text-white border-b-2 border-gray-600 focus:outline-none focus:border-green-500" value="Tim B" oninput="updateTeamName('B')">
-                <div class="flex items-center justify-between mb-4">
-                    <button class="bg-red-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-red-700 transition duration-300 btn-animate" onclick="ubahSkor('B', 'besar', -1)">-</button>
-                    <span class="text-lg text-gray-300">Skor Besar:</span>
-                    <span class="text-6xl font-bold text-white" id="skorBesarB">0</span>
-                    <button class="bg-green-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-green-700 transition duration-300 btn-animate" onclick="ubahSkor('B', 'besar', 1)">+</button>
+            <!-- Player 2 -->
+            <div class="flex flex-col items-center">
+                <h2 id="player2" class="text-xl font-bold mb-4 editable cursor-pointer">Player 2</h2>
+                <div class="counter flex items-center space-x-4 mb-4">
+                    <button class="decrement text-2xl font-bold text-gray-700">-</button>
+                    <span class="value text-8xl font-extrabold text-green-500">0</span>
+                    <button class="increment text-2xl font-bold text-gray-700">+</button>
                 </div>
-                <div class="flex items-center justify-between">
-                    <button class="bg-red-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-red-700 transition duration-300 btn-animate" onclick="ubahSkor('B', 'kecil', -1)">-</button>
-                    <span class="text-lg text-gray-300">Skor Kecil:</span>
-                    <span class="text-4xl font-bold text-white" id="skorKecilB">0</span>
-                    <button class="bg-green-500 text-white px-3 py-2 rounded-lg shadow-lg hover:bg-green-700 transition duration-300 btn-animate" onclick="ubahSkor('B', 'kecil', 1)">+</button>
+                <div class="counter flex items-center space-x-4">
+                    <button class="decrement text-2xl font-bold text-gray-700">-</button>
+                    <span class="value text-4xl font-extrabold text-blue-500">0</span>
+                    <button class="increment text-2xl font-bold text-gray-700">+</button>
                 </div>
             </div>
         </div>
+        <!-- BALAC -->
+        <div class="flex flex-col items-center">
+            <h2 class="text-xl font-bold mb-4">BALAC</h2>
+            <div class="counter flex items-center space-x-4">
+                <button class="decrement text-2xl font-bold text-gray-700">-</button>
+                <span class="value text-8xl font-extrabold text-red-700">0</span>
+                <button class="increment text-2xl font-bold text-gray-700">+</button>
+            </div>
+        </div>
+        <!-- Reset Button -->
+        <button id="reset-button" class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg">Reset</button>
     </div>
 
-    <script>
-        function ubahSkor(tim, jenis, perubahan) {
-            const skorBesarA = document.getElementById('skorBesarA');
-            const skorKecilA = document.getElementById('skorKecilA');
-            const skorBesarB = document.getElementById('skorBesarB');
-            const skorKecilB = document.getElementById('skorKecilB');
+    <!-- Win Modal -->
+    <div id="modal-win" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center text-black">
+            <h2 class="text-2xl font-bold mb-4">Congrats, you win!!</h2>
+            <button id="close-modal-win" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg">Close</button>
+        </div>
+    </div>
 
-            if (tim === 'A') {
-                if (jenis === 'besar') {
-                    skorBesarA.textContent = Math.max(0, parseInt(skorBesarA.textContent) + perubahan);
-                } else {
-                    let newSkorKecilA = parseInt(skorKecilA.textContent) + perubahan;
-                    if (newSkorKecilA >= 10) {
-                        newSkorKecilA = 0;
-                        skorBesarA.textContent = parseInt(skorBesarA.textContent) + 1;
-                    } else if (newSkorKecilA < 0) {
-                        newSkorKecilA = 0;
-                    }
-                    skorKecilA.textContent = newSkorKecilA;
-                }
-            } else {
-                if (jenis === 'besar') {
-                    skorBesarB.textContent = Math.max(0, parseInt(skorBesarB.textContent) + perubahan);
-                } else {
-                    let newSkorKecilB = parseInt(skorKecilB.textContent) + perubahan;
-                    if (newSkorKecilB >= 10) {
-                        newSkorKecilB = 0;
-                        skorBesarB.textContent = parseInt(skorBesarB.textContent) + 1;
-                    } else if (newSkorKecilB < 0) {
-                        newSkorKecilB = 0;
-                    }
-                    skorKecilB.textContent = newSkorKecilB;
-                }
-            }
-        }
-
-        function updateTeamName(tim) {
-            const inputA = document.getElementById('timA');
-            const inputB = document.getElementById('timB');
-
-            if (tim === 'A') {
-                inputA.value = inputA.value;
-            } else {
-                inputB.value = inputB.value;
-            }
-        }
-    </script>
+    <!-- Edit Name Modal -->
+    <div id="modal-edit" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-8 rounded-lg shadow-lg text-center text-black">
+            <h2 class="text-2xl font-bold mb-4">Edit Player Name</h2>
+            <input id="player-name-input" type="text" class="border p-2 mb-4 w-full" />
+            <input id="current-edit" type="hidden" />
+            <button id="save-name" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg">OK</button>
+            <button id="close-modal-edit" class="mt-4 px-4 py-2 bg-gray-500 text-white rounded-lg">Cancel</button>
+        </div>
+    </div>
 </body>
 </html>
